@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    
+
+<input id="city" placeholder="Podaj miasto w dowolnym języku">
+<button id="btn">Pobierz pogodę</button>
+
+<pre id="output"></pre>
+
+<script>
+document.getElementById("btn").addEventListener("click", () => {
+  const city = document.getElementById("city").value;
+
+  // 1. Geokodowanie w dowolnym języku (OSM)
+  fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(city)}`, {
+    headers: {
+      "User-Agent": "weather-app-demo"
+    }
+  })
+    .then(res => res.json())
+    .then(results => {
+      if (results.length === 0) {
+        document.getElementById("output").textContent = "Nie znaleziono miasta!";
+        return;
+      }
+
+      const place = results[0]; // pierwsze trafienie
+      const lat = place.lat;
+      const lon = place.lon;
+
+      // 2. Pobranie pogody z Open-Meteo
+      return fetch(
+        `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`
+      )
+        .then(res => res.json())
+        .then(weather => {
+          document.getElementById("output").textContent =
+            `Miasto: ${place.display_name}
+Temperatura: ${weather.current_weather.temperature}°C
+Wiatr: ${weather.current_weather.windspeed} km/h`;
+        });
+    })
+    .catch(() => {
+      document.getElementById("output").textContent = "Błąd połączenia!";
+    });
+});
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,125 @@
+body{
+    height: 100vh;
+    background: linear-gradient(to bottom, #2E1065, #581C87);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow-x: hidden;
+}
+
+
+main{
+    width: 80%;
+    height: 80vh;
+    background: linear-gradient(135deg, #A855F7, #7E22CE);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+    border-radius: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+    
+}
+
+
+#flag1{
+    width: 200px;
+    height: 200px;
+    border-radius: 20px;
+    background-color: white;
+    padding: 10px;
+    text-align: center;
+    transition: transform 0.3s;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+
+
+}
+#flag2{
+    width: 200px;
+    height: 200px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+    border-radius: 20px;
+    background-color: white;
+    padding: 10px;
+    text-align: center;
+    transition: transform 0.3s;
+
+}
+
+#flag1:hover{
+    transform: scale(1.05);
+}
+
+#flag2:hover{
+    transform: scale(1.05);
+}
+
+.img{
+    width: 190px;
+    height: 100px;
+
+    border-radius: 20px;
+    border: 2px solid black;
+}
+
+#h2Score{
+    position: absolute; 
+    top: 10px;
+    right: 20px;
+    margin: 0;
+    color: white;
+}
+#h2HP{
+    position: absolute;
+    top: 10px; 
+    left: 20px;
+    margin: 0;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+
+}
+
+.GG{
+    position: absolute;
+    background-color: grey;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.GG button{
+    width:150px;
+    height:auto;
+    padding: 10px;
+    background-color: #A855F7;
+    border-radius: 15px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 20px;
+    transition: transform 0.3s, background-color 0.3s;
+}       
+
+.GG button:hover{
+    transform: scale(1.1);
+    background-color: #7E22CE;
+}
+
+#h2HP{
+    background-color: white;
+    padding: 5px;
+    border-radius: 10px;
+}
+
+.cardGG{
+    background-color: white;
+    padding: 20px;
+    border-radius: 20px;
+    width: 30%;
+}
+
+.slide-right{animation: slide-in-right .5s cubic-bezier(.25,.46,.45,.94) both}
+
+@keyframes slide-in-right{0%{transform:translateX(1000px);opacity:0}100%{transform:translateX(0);opacity:1}}
+
+@keyframes slide-in-left{0%{transform:translateX(-1000px);opacity:0}100%{transform:translateX(0);opacity:1}}

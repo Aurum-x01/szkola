@@ -1,0 +1,16 @@
+body{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+
+}
+.div{
+    text-align: center;
+    height: auto;
+    width: 200px;
+    border: 1px solid black;
+}   
+
+.img{
+    width: 200px;
+}

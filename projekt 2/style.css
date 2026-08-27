@@ -1,0 +1,37 @@
+#map {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 0;
+    
+}
+.popup-content img {
+    width: 100px;
+    height: auto;
+    z-index: 1;
+}
+
+    
+
+.przyciski{
+    position: relative;
+    padding: 10px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: bold;
+    transition: transform 0.3s, background-color 0.3s;
+    margin-bottom: 5px;
+
+}   
+
+.przyciski:hover{
+    transform: scale(1.05);
+    background-color: rgb(216, 216, 216);
+}
+
+
+#buttonDiv{
+    margin-left: 40px;
+}

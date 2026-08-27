@@ -1,0 +1,17 @@
+body{
+    display: flex;
+    flex-wrap: wrap;
+}
+
+button{
+    position: absolute;
+}
+
+tr{
+    width: 10px;
+    height: 10px;
+}
+td{
+    width: 10px;
+    height: 10px;
+}

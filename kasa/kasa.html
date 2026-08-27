@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Program kasjera</title>
+  <style>
+    :root{--bg:#f6f7fb;--card:#ffffff;--accent:#2563eb;--accent-2:#7c3aed}
+    *{box-sizing:border-box;font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial}
+    body{margin:0;background:linear-gradient(180deg,var(--bg),#fff);padding:28px;color:#111}
+    .wrap{max-width:1000px;margin:0 auto;display:grid;grid-template-columns:1fr 420px;gap:20px}
+    .card{background:var(--card);border-radius:12px;box-shadow:0 6px 20px rgba(20,20,50,0.06);padding:18px}
+    h1{margin:0 0 8px;font-size:20px}
+    .products{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+    .prod{padding:10px;border-radius:8px;border:1px solid #eef2ff;display:flex;justify-content:space-between;align-items:center}
+    .prod .meta{display:flex;flex-direction:column}
+    .prod strong{font-size:15px}
+    .prod small{color:#555}
+    .btn{background:var(--accent);color:#fff;border:0;padding:8px 10px;border-radius:8px;cursor:pointer}
+    .btn:active{transform:translateY(1px)}
+    .controls{display:flex;gap:8px;margin-top:10px}
+    .search{flex:1;padding:8px;border-radius:8px;border:1px solid #ddd}
+
+    /* koszyk */
+    .cart-list{max-height:300px;overflow:auto;margin-top:8px}
+    .item{display:flex;align-items:center;justify-content:space-between;padding:8px;border-bottom:1px dashed #eee}
+    .qty{display:flex;gap:6px;align-items:center}
+    .qty button{padding:4px 8px;border-radius:6px;border:1px solid #ddd;background:#fff;cursor:pointer}
+    .summary{margin-top:12px;padding-top:12px;border-top:1px solid #f0f0f0}
+    .summary div{display:flex;justify-content:space-between;padding:6px 0}
+    .total{font-weight:700;font-size:18px}
+
+    /* płatność */
+    .payment{margin-top:12px;display:flex;flex-direction:column;gap:6px}
+    .payment input{padding:6px;border-radius:6px;border:1px solid #ddd;width:120px}
+    .change{font-weight:600;margin-top:6px}
+
+    /* rachunek */
+    .receipt{white-space:pre-wrap;font-family:monospace;background:#fafafa;padding:12px;border-radius:8px;margin-top:10px}
+
+    footer{grid-column:1/-1;margin-top:12px;text-align:center;color:#666;font-size:13px}
+
+    @media (max-width:920px){.wrap{grid-template-columns:1fr;}.products{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Program kasjera</h1>
+      <div>Wybierz produkty, dodaj ilość i wydrukuj paragon.</div>
+
+      <div class="controls">
+        <input id="search" class="search" placeholder="Szukaj produktu..." />
+        <button id="clearSearch" class="btn" style="background:#6b7280">Wyczyść</button>
+      </div>
+
+      <div id="products" class="products" style="margin-top:12px"></div>
+    </div>
+
+    <div class="card">
+      <h1>Koszyk</h1>
+      <div id="cart" class="cart-list"></div>
+
+      <div class="summary">
+        <div><span>Suma netto:</span><span id="sumNet">0.00 zł</span></div>
+        <div><span>VAT (23%):</span><span id="vat">0.00 zł</span></div>
+        <div class="total"><span>Razem do zapłaty:</span><span id="sumGross">0.00 zł</span></div>
+
+        <div class="payment">
+          <div style="display:flex;gap:8px;align-items:center">
+            <label for="cash">Gotówka od klienta: </label>
+            <input id="cash" type="number" min="0" step="0.01" placeholder="0.00 zł">
+            <button id="calculateChange" class="btn">Oblicz resztę</button>
+          </div>
+          <div class="change" id="changeDisplay">Reszta: 0.00 zł</div>
+        </div>
+
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <button id="print" class="btn">Drukuj paragon</button>
+          <button id="clear" class="btn" style="background:#ef4444">Wyczyść koszyk</button>
+        </div>
+
+        <div class="receipt" id="receipt" style="display:none"></div>
+      </div>
+    </div>
+
+    <footer>Prosty program kasjera — interfejs po polsku</footer>
+  </div>
+
+  <script>
+    const PRODUCTS = [
+     // Dodaj resztę produktów tak jak wcześniej...
+      // Lista produktów przykładowych (nazwa: cena netto w zł)
+{id: 'jablko', name: 'Jabłko', price: 2.50},
+  {id: 'banan', name: 'Banan', price: 3.20},
+  {id: 'chleb', name: 'Chleb', price: 5.00},
+  {id: 'mleko', name: 'Mleko 1L', price: 4.30},
+  {id: 'ser', name: 'Ser żółty 200g', price: 8.90},
+  {id: 'maslo', name: 'Masło 200g', price: 7.50},
+  {id: 'cukier', name: 'Cukier 1kg', price: 3.80},
+  {id: 'ryz', name: 'Ryż 1kg', price: 6.40},
+  {id: 'woda', name: 'Woda mineralna 1.5L', price: 2.90},
+  {id: 'kawa', name: 'Kawa mielona 250g', price: 14.50},
+  {id: 'herbata', name: 'Herbata 50g', price: 9.20},
+  {id: 'jajka', name: 'Jajka 10 szt.', price: 7.10},
+
+  // --- dodatkowe 100 produktów ---
+  {id: 'sok_pomaranczowy', name: 'Sok pomarańczowy 1L', price: 5.60},
+  {id: 'sok_jablkowy', name: 'Sok jabłkowy 1L', price: 5.40},
+  {id: 'makaron_spaghetti', name: 'Makaron spaghetti 500g', price: 4.80},
+  {id: 'makaron_penne', name: 'Makaron penne 500g', price: 4.70},
+  {id: 'olej_rzepakowy', name: 'Olej rzepakowy 1L', price: 8.90},
+  {id: 'olej_slonecznikowy', name: 'Olej słonecznikowy 1L', price: 9.10},
+  {id: 'maka_pszenna', name: 'Mąka pszenna 1kg', price: 3.50},
+  {id: 'maka_zytnia', name: 'Mąka żytnia 1kg', price: 4.00},
+  {id: 'platki_owsiane', name: 'Płatki owsiane 500g', price: 4.60},
+  {id: 'miod', name: 'Miód naturalny 400g', price: 16.90},
+  {id: 'czekolada_mleczna', name: 'Czekolada mleczna 100g', price: 4.30},
+  {id: 'czekolada_gorzka', name: 'Czekolada gorzka 100g', price: 4.70},
+  {id: 'kefir', name: 'Kefir 400ml', price: 3.20},
+  {id: 'jogurt_naturalny', name: 'Jogurt naturalny 150g', price: 2.30},
+  {id: 'jogurt_owocowy', name: 'Jogurt owocowy 150g', price: 2.80},
+  {id: 'chipsy_solone', name: 'Chipsy solone 150g', price: 6.50},
+  {id: 'chipsy_paprykowe', name: 'Chipsy paprykowe 150g', price: 6.70},
+  {id: 'wafle', name: 'Wafle w czekoladzie', price: 3.90},
+  {id: 'ciastka_maślane', name: 'Ciastka maślane 200g', price: 5.40},
+  {id: 'baton_czekoladowy', name: 'Baton czekoladowy', price: 2.90},
+  {id: 'lody_waniliowe', name: 'Lody waniliowe 500ml', price: 10.50},
+  {id: 'lody_czekoladowe', name: 'Lody czekoladowe 500ml', price: 10.50},
+  {id: 'piwo', name: 'Piwo 0.5L', price: 5.60},
+  {id: 'wino_czerwone', name: 'Wino czerwone 0.75L', price: 26.00},
+  {id: 'wino_biale', name: 'Wino białe 0.75L', price: 24.50},
+  {id: 'wodka', name: 'Wódka 0.5L', price: 32.00},
+  {id: 'papier_toaletowy', name: 'Papier toaletowy 8 rolek', price: 15.90},
+  {id: 'szampon', name: 'Szampon do włosów 400ml', price: 11.80},
+  {id: 'zel_pod_prysznic', name: 'Żel pod prysznic 400ml', price: 9.90},
+  {id: 'mydlo', name: 'Mydło w kostce', price: 2.80},
+  {id: 'pasta_do_zebow', name: 'Pasta do zębów 75ml', price: 8.50},
+  {id: 'szczoteczka', name: 'Szczoteczka do zębów', price: 6.40},
+  {id: 'gabka', name: 'Gąbka do mycia naczyń (3 szt.)', price: 4.10},
+  {id: 'plyn_do_naczyń', name: 'Płyn do naczyń 1L', price: 7.50},
+  {id: 'proszek_do_prania', name: 'Proszek do prania 2kg', price: 28.00},
+  {id: 'plyn_do_plukania', name: 'Płyn do płukania 1L', price: 9.30},
+  {id: 'kawa_rozpuszczalna', name: 'Kawa rozpuszczalna 200g', price: 18.50},
+  {id: 'czipsy_serowe', name: 'Chipsy serowe 150g', price: 6.90},
+  {id: 'cukierki', name: 'Cukierki owocowe 200g', price: 5.20},
+  {id: 'margaryna', name: 'Margaryna 250g', price: 5.00},
+  {id: 'serek_homogenizowany', name: 'Serek homogenizowany 150g', price: 2.60},
+  {id: 'twarog', name: 'Twaróg półtłusty 250g', price: 4.80},
+  {id: 'szynka', name: 'Szynka gotowana 200g', price: 9.80},
+  {id: 'kielbasa', name: 'Kiełbasa 1kg', price: 29.90},
+  {id: 'parowki', name: 'Parówki 300g', price: 7.20},
+  {id: 'kurczak', name: 'Kurczak cały 1kg', price: 13.90},
+  {id: 'wołowina', name: 'Wołowina 1kg', price: 38.00},
+  {id: 'ryba', name: 'Filet z dorsza 1kg', price: 42.00},
+  {id: 'ziemniaki', name: 'Ziemniaki 1kg', price: 2.80},
+  {id: 'marchew', name: 'Marchew 1kg', price: 3.20},
+  {id: 'cebula', name: 'Cebula 1kg', price: 3.10},
+  {id: 'czosnek', name: 'Czosnek 100g', price: 2.40},
+  {id: 'pomidor', name: 'Pomidor 1kg', price: 7.80},
+  {id: 'ogorek', name: 'Ogórek 1kg', price: 6.40},
+  {id: 'papryka', name: 'Papryka 1kg', price: 9.20},
+  {id: 'salata', name: 'Sałata masłowa', price: 4.50},
+  {id: 'jablko_gala', name: 'Jabłko Gala 1kg', price: 4.30},
+  {id: 'gruszka', name: 'Gruszka 1kg', price: 6.10},
+  {id: 'pomarancza', name: 'Pomarańcza 1kg', price: 7.50},
+  {id: 'mandarynka', name: 'Mandarynka 1kg', price: 7.80},
+  {id: 'cytryna', name: 'Cytryna 1kg', price: 9.00},
+  {id: 'arbuz', name: 'Arbuz 1kg', price: 3.90},
+  {id: 'winogrona', name: 'Winogrona 1kg', price: 10.80},
+  {id: 'truskawki', name: 'Truskawki 500g', price: 8.40},
+  {id: 'maliny', name: 'Maliny 250g', price: 9.90},
+  {id: 'borowki', name: 'Borówki 250g', price: 10.50},
+  {id: 'ogorek_kiszony', name: 'Ogórki kiszone 900g', price: 7.90},
+  {id: 'kapusta_kiszona', name: 'Kapusta kiszona 1kg', price: 6.20},
+  {id: 'musztarda', name: 'Musztarda 200g', price: 3.60},
+  {id: 'ketchup', name: 'Ketchup 500g', price: 6.10},
+  {id: 'majonez', name: 'Majonez 400ml', price: 7.40},
+  {id: 'sos_pomidorowy', name: 'Sos pomidorowy 500g', price: 5.90},
+  {id: 'koncentrat_pomidorowy', name: 'Koncentrat pomidorowy 200g', price: 4.80},
+  {id: 'ogorek_konserwowy', name: 'Ogórki konserwowe 900g', price: 7.60},
+  {id: 'dorsz', name: 'Dorsz mrożony 400g', price: 19.90},
+  {id: 'makrela', name: 'Makrela wędzona', price: 12.90},
+  {id: 'tunczyk', name: 'Tuńczyk w puszce 170g', price: 8.40},
+  {id: 'szprotki', name: 'Szprotki w oleju 170g', price: 6.20},
+  {id: 'sardynki', name: 'Sardynki w sosie pomidorowym', price: 6.50},
+  {id: 'woda_gazowana', name: 'Woda gazowana 1.5L', price: 2.80},
+  {id: 'napoj_kola', name: 'Napój typu cola 2L', price: 6.40},
+  {id: 'napoj_energetyczny', name: 'Napój energetyczny 250ml', price: 5.20},
+  {id: 'tonik', name: 'Tonik 1L', price: 6.80},
+  {id: 'piwo_bezalkoholowe', name: 'Piwo bezalkoholowe 0.5L', price: 5.10},
+  {id: 'chusteczki', name: 'Chusteczki higieniczne 10x10szt', price: 4.20},
+  {id: 'worki_na_smieci', name: 'Worki na śmieci 35L (20 szt.)', price: 7.00},
+  {id: 'folia_spozywcza', name: 'Folia spożywcza 30m', price: 6.80},
+  {id: 'folia_aluminiowa', name: 'Folia aluminiowa 10m', price: 5.90},
+  {id: 'zapalniczka', name: 'Zapalniczka jednorazowa', price: 3.00},
+  {id: 'baterie', name: 'Baterie AA (4 szt.)', price: 11.90},
+  {id: 'zapalczki', name: 'Zapałki 3 opak.', price: 2.20},
+  {id: 'notes', name: 'Notes A5 80 kartek', price: 6.40},
+  {id: 'dlugopis', name: 'Długopis niebieski', price: 2.30},
+  {id: 'olowek', name: 'Ołówek HB', price: 1.80},
+  {id: 'zeszyt', name: 'Zeszyt A4 96 kartek', price: 7.20}
+];
+
+    const VAT_RATE = 0.23;
+
+    const productsEl = document.getElementById('products');
+    const cartEl = document.getElementById('cart');
+    const sumNetEl = document.getElementById('sumNet');
+    const vatEl = document.getElementById('vat');
+    const sumGrossEl = document.getElementById('sumGross');
+    const receiptEl = document.getElementById('receipt');
+    const cashEl = document.getElementById('cash');
+    const changeEl = document.getElementById('changeDisplay');
+
+    let cart = {};
+
+    function formatPrice(n){return n.toFixed(2) + ' zł'}
+
+    function renderProducts(filter = ''){
+      productsEl.innerHTML = '';
+      const f = filter.trim().toLowerCase();
+      PRODUCTS.filter(p => p.name.toLowerCase().includes(f) || p.id.includes(f))
+        .forEach(p => {
+          const d = document.createElement('div'); d.className='prod';
+          d.innerHTML = `<div class="meta"><strong>${p.name}</strong><small>${formatPrice(p.price)}</small></div>`;
+          const btn = document.createElement('button'); btn.className='btn'; btn.textContent='Dodaj';
+          btn.onclick = () => addToCart(p.id);
+          d.appendChild(btn);
+          productsEl.appendChild(d);
+        });
+    }
+
+    function addToCart(id){
+      const prod = PRODUCTS.find(p=>p.id===id); if(!prod) return;
+      if(!cart[id]) cart[id] = {product: prod, qty:0};
+      cart[id].qty += 1;
+      renderCart();
+    }
+
+    function changeQty(id, delta){
+      if(!cart[id]) return;
+      cart[id].qty += delta;
+      if(cart[id].qty <= 0) delete cart[id];
+      renderCart();
+    }
+
+    function removeItem(id){ delete cart[id]; renderCart(); }
+
+    function renderCart(){
+      cartEl.innerHTML = '';
+      let sumNet = 0;
+      Object.values(cart).forEach(({product, qty})=>{
+        const lineNet = product.price * qty;
+        sumNet += lineNet;
+        const it = document.createElement('div'); it.className='item';
+        it.innerHTML = `
+          <div>
+            <div style="font-weight:600">${product.name}</div>
+            <div style="font-size:13px;color:#666">${formatPrice(product.price)} x ${qty} = ${formatPrice(lineNet)}</div>
+          </div>
+        `;
+        const controls = document.createElement('div'); controls.className='qty';
+        const minus = document.createElement('button'); minus.textContent='−'; minus.onclick = ()=>changeQty(product.id, -1);
+        const plus = document.createElement('button'); plus.textContent='+'; plus.onclick = ()=>changeQty(product.id, +1);
+        const del = document.createElement('button'); del.textContent='Usuń'; del.onclick = ()=>removeItem(product.id);
+        controls.appendChild(minus); controls.appendChild(plus); controls.appendChild(del);
+        it.appendChild(controls);
+        cartEl.appendChild(it);
+      });
+
+      const vat = sumNet * VAT_RATE;
+      const gross = sumNet + vat;
+      sumNetEl.textContent = formatPrice(sumNet);
+      vatEl.textContent = formatPrice(vat);
+      sumGrossEl.textContent = formatPrice(gross);
+
+      changeEl.textContent = 'Reszta: 0.00 zł';
+
+      if(Object.keys(cart).length === 0){ receiptEl.style.display='none'; receiptEl.textContent=''; }
+      else{
+        receiptEl.style.display='block';
+        let now = new Date();
+        let header = `PARAGON FISKALNY\nData: ${now.toLocaleString('pl-PL')}\n-------------------------------\n`;
+        let body = '';
+        Object.values(cart).forEach(({product, qty})=>{
+          const lineNet = product.price * qty;
+          body += `${product.name} x${qty}    ${lineNet.toFixed(2)} zł\n`;
+        });
+        body += `-------------------------------\nSuma netto: ${sumNet.toFixed(2)} zł\nVAT (23%): ${vat.toFixed(2)} zł\nRAZEM: ${gross.toFixed(2)} zł\n`;
+        receiptEl.textContent = header + body + '\nDziękujemy za zakupy!';
+      }
+    }
+
+    // controls
+    document.getElementById('print').addEventListener('click', ()=>{
+      if(Object.keys(cart).length===0){ alert('Koszyk jest pusty.'); return; }
+      const printWindow = window.open('', '_blank');
+      printWindow.document.write(`<pre style="font-family:monospace;white-space:pre-wrap;font-size:14px">${receiptEl.textContent}</pre>`);
+      printWindow.document.close();
+      printWindow.focus();
+      printWindow.print();
+    });
+
+    document.getElementById('clear').addEventListener('click', ()=>{ if(confirm('Wyczyścić koszyk?')){ cart={}; renderCart(); }});
+    document.getElementById('search').addEventListener('input', (e)=> renderProducts(e.target.value));
+    document.getElementById('clearSearch').addEventListener('click', ()=>{ document.getElementById('search').value=''; renderProducts(); });
+
+    // płatność - reszta
+    document.getElementById('calculateChange').addEventListener('click', () => {
+      const cash = parseFloat(cashEl.value);
+      const total = Object.values(cart).reduce((sum, {product, qty}) => sum + product.price * qty * (1 + VAT_RATE), 0);
+      if (isNaN(cash) || cash < total) {
+        alert('Podana kwota jest za mała!');
+        changeEl.textContent = 'Reszta: 0.00 zł';
+        return;
+      }
+      const change = cash - total;
+      changeEl.textContent = 'Reszta: ' + change.toFixed(2) + ' zł';
+    });
+
+    // initial render
+    renderProducts();
+    renderCart();
+  </script>
+</body>
+</html>

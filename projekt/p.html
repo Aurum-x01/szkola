@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.4/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet@1.3.4/dist/leaflet.js"></script>
+    <title>Mapa z danymi krajów</title>
+    <style>
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
+        .popup-content img {
+            width: 100px;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+
+    <script>
+        // Inicjalizacja mapy
+        var map = L.map('map').setView([20, 0], 2); // Global view
+
+        // Warstwa kafelków
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Pobranie danych o krajach (łącznie z latlng)
+        fetch("https://restcountries.com/v3.1/all?fields=name,flags,capital,population,latlng")
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(country => {
+                    // Sprawdzenie czy są współrzędne
+                    if (country.latlng && country.latlng.length === 2) {
+                        const [lat, lng] = country.latlng;
+
+                        const popupContent = `
+                            <div class="popup-content">
+                                <h3>${country.name.common}</h3>
+                                <img src="${country.flags.png}" alt="Flag of ${country.name.common}">
+                                <p><strong>Stolica:</strong> ${country.capital ? country.capital[0] : "Brak danych"}</p>
+                                <p><strong>Populacja:</strong> ${country.population.toLocaleString()}</p>
+                            </div>
+                        `;
+
+                        // Dodanie markera z popupem
+                        L.marker([lat, lng])
+                            .addTo(map)
+                            .bindPopup(popupContent);
+                    }
+                });
+            })
+            .catch(error => {
+                console.error("Błąd podczas pobierania danych z API:", error);
+            });
+    </script>
+</body>
+</html>

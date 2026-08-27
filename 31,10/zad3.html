@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <style>
+        body{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: black;
+            flex-direction: column;
+            height: auto;
+            margin: 0 auto;
+        }
+        div{
+            background-color: aqua;
+            width: 200px;
+            text-align: center;
+            padding: 5px;
+            margin-bottom: 5px;
+            border-radius: 20px;
+            
+        }
+        input{
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 20px;
+            transition: background-color 0.3s;
+        }
+        input:focus{
+            background-color: rgb(201, 201, 201);
+        }
+    </style>
+</head>
+<body>
+    <input type="text" id="text">
+    <button onclick="getData()">szukaj</button>
+    <script src="zad3.js"></script>
+    <script>    
+        AOS.init();
+    </script>
+</body>
+</html>

@@ -1,0 +1,45 @@
+body{
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+main{
+    background-color: blue;
+    width: 80%;
+    border-radius: 20px;
+    padding: 20px;
+    height: 60vh;
+    display: flex;
+    flex-wrap: wrap;
+
+    gap: 10px;
+    border: 2px solid black;
+}
+
+
+#health{
+    background-color: white;
+    width: 100px;
+    height: 200px;
+    text-align: center;
+    border: 2px solid black;
+}
+
+#div1{
+width: 200px;
+height: 200px;
+border: 1px solid black;
+border-radius: 20px;
+background-color: white;
+
+}   
+
+#div2{
+width: 200px;
+height: 200px;
+border: 1px solid black;
+border-radius: 20px;
+background-color: white;
+
+}   
