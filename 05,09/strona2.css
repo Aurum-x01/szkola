@@ -1,0 +1,39 @@
+body{
+    margin: 0%;
+}
+
+header{
+    float: right;
+    background-color: aqua;
+    width: 75%;
+    height: 20vh;
+}
+.menu{
+    float: left;
+    background-color: blueviolet;
+    width: 25%;
+    height: 120vh;
+}
+
+main{
+    float: right;
+    background-color: blue;
+    height: 80vh;
+    width: 75%;
+    display: flex;
+    justify-content: center;
+}
+
+footer{
+    float: right;
+    background-color: gray;
+    height: 20vh;
+    width: 75%;
+}
+
+.srodek{
+    background-color: aliceblue;
+    width: 20%;
+    height: 10%;
+    margin: auto;
+}

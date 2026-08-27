@@ -1,0 +1,38 @@
+li{
+    font-size: 16px;
+    height: 50px;
+    transition: font-size 0.3s;
+}
+
+li:hover{
+    font-size: 20px;
+}
+
+.karta{
+    width: 300px;
+    background-color: rgb(216, 216, 216);
+    text-align: center;
+    margin: 0px 15px 0px 0px;
+    border-radius: 20px;
+    transition: transform 0.3s;
+    border-style: solid; 
+    float: left;   
+}
+
+.karta:hover{
+    transform: scale(1.1);
+}
+
+img{
+object-fit: cover;
+height: 100%;
+width: 100%;
+border-top-left-radius: 10px;
+border-top-right-radius: 10px;
+
+}
+p{
+    padding: 20px;
+    text-align: left;
+}
+

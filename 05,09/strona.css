@@ -1,0 +1,58 @@
+body{
+    margin: 0%;
+
+}
+header{
+    margin: 0%;
+    float: right;
+    background-color: violet;
+    width: 90%;
+    height: 10vh;
+    text-align: center;
+}
+
+#menu{
+    margin: 0%;
+    float: left;
+    background-color: blueviolet;
+    width: 10%;
+    height: 100vh;
+}
+
+footer{
+float: right;
+background-color: grey;
+width: 90%;
+height: 5vh;
+}
+
+main{
+    height: 85vh;
+    width: 90%;
+    float: right;
+    background-color: aqua;
+    
+}
+
+button{
+    margin-top: 60px;
+    border-radius: 10px;
+    padding:4px;
+}
+
+#dwa{
+float: left;
+background-color: beige;
+width: 25%;
+padding: 50px
+}
+
+#piec{
+    float: left;
+    width: 50%;
+    background-color: blue;
+}
+
+.good{      
+    margin: 10px 20px 0px 20px;
+}

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Плавна зміна теми</title>
+</head>
+<body id="body" style="background-color: white; transition: background-color 0.5s ease;">
+  <div id="div1" style="
+    width:200px;
+    height:200px;
+    background-color:#fff;
+    margin:50px auto;
+    box-shadow:0 10px 30px rgba(0,0,0,0.35);
+    transition: box-shadow 0.5s ease;">
+  </div>
+
+  <button onclick="theme()">Змінити тему</button>
+
+  <script>
+    const body = document.getElementById("body");
+    const div1 = document.getElementById("div1");
+
+    function theme() {
+      // Плавна зміна кольору вже є завдяки transition
+      if (body.style.backgroundColor === "white" || body.style.backgroundColor === "") {
+        body.style.backgroundColor = "black";
+        div1.style.boxShadow = "0 10px 30px rgba(255, 255, 255, 0.34)";
+      } else {
+        body.style.backgroundColor = "white";
+        div1.style.boxShadow = "0 10px 30px rgba(0,0,0,0.35)";
+      }
+    }
+  </script>
+</body>
+</html>
